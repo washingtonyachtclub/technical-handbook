@@ -1,6 +1,7 @@
 # Washington Yacht Club Technical Handbook
 
-**Last updated:** 2026-08-23  
+**Last updated:** 2026-09-15
+
 **Contact:** Eshan Arora
 
 This handbook documents the club's production software, infrastructure, and current
@@ -11,8 +12,7 @@ technical migration work.
 - **Resilience:** Systems should remain reliable through officer turnover and for
   years with minimal recurring maintenance. Prefer managed services, automation,
   documented recovery, and clear ownership.
-- **Cost:** Prefer services with generous free tiers or nonprofit discounts when
-  they meet the club's operational needs.
+- **Cost:** Prefer services with generous free tiers or nonprofit discounts.
 
 ## Current systems
 
@@ -22,8 +22,10 @@ technical migration work.
 | Database v2                        | Vercel with MySQL on DreamHost | The current member and club-operations web application.                                        | [database.washingtonyachtclub.org](https://database.washingtonyachtclub.org/) is a CNAME for [wyc-database-v2.vercel.app](https://wyc-database-v2.vercel.app/) |
 | Replacement public website         | Astro                          | Under development and not deployed.                                                            | —                                                                                                                                                              |
 | Keelboat calendar and reservations | DreamHost                      | The current calendar and reservation application. It has not yet been moved into database v2.  | —                                                                                                                                                              |
-| Checkout                           | Database v2 on Vercel          | The new checkout is in beta. The legacy checkout will redirect to it after the beta ends.      | [New checkout](https://database.washingtonyachtclub.org/checkout) · [Legacy checkout](https://checkout.washingtonyachtclub.org/)                               |
+| Checkout                           | Database v2                    | The new checkout is in beta. The legacy checkout will redirect to it after the beta ends.      | [New checkout](https://database.washingtonyachtclub.org/checkout) · [Legacy checkout](https://checkout.washingtonyachtclub.org/)                               |
 | Novice written tests               | WordPress                      | Being ported to database v2 and nearly ready.                                                  | [Current](https://washingtonyachtclub.org/written-tests/) · [Replacement](https://database.washingtonyachtclub.org/written-tests)                              |
+| New memberships and renewals       | Database v2                    | Signup, renewal, payment, and officer approval are handled in database v2.                     | [Join](https://database.washingtonyachtclub.org/join) · [Approvals](https://database.washingtonyachtclub.org/membership-approvals)                             |
+| Member and guest waivers           | Database v2 and Cloudflare R2  | Waivers are handled in database v2, with executed PDFs stored privately in R2.                 | [Guest waiver](https://database.washingtonyachtclub.org/guest-waiver)                                                                                          |
 | Documents                          | Public GitHub repository       | Club documents are maintained in the `documents` repository.                                   | [Documents](https://documents.washingtonyachtclub.org/)                                                                                                        |
 | Payments and commerce              | Square                         | Handles membership payments, donations, keelboat reservations, merchandise, and other sales.   | [Square storefront](https://washington-yacht-club.square.site/)                                                                                                |
 | Transactional email                | Resend                         | Database v2 sends club email through Resend.                                                   | —                                                                                                                                                              |
@@ -72,6 +74,13 @@ Square is expected to remain the club's payment platform. Stripe has a better
 developer experience, but splitting payments between providers would make club
 operations and reporting more complicated.
 
+### Cloudflare R2
+
+Database v2 stores executed member and guest waiver PDFs in a private Cloudflare R2
+bucket separate from public website images. It accesses the bucket using credentials
+stored in Vercel. Access should remain limited to authorized officers and
+maintainers.
+
 ### Account ownership
 
 Many newer service accounts use `webmaster@washingtonyachtclub.org`, including
@@ -84,10 +93,12 @@ non-Google services.
 
 Moving the public website away from WordPress also requires replacing or migrating:
 
-- waivers and their associated workflow;
 - novice written tests;
 - photo storage and curated galleries;
 - any remaining WordPress-managed content or integrations.
+
+New-member processing and waivers no longer depend on WordPress. The public website
+embeds Database v2's join page.
 
 ## Backups and recovery
 
@@ -118,7 +129,7 @@ image storage.
 ## To-dos
 
 - [ ] Retire DreamHost after migrating its [current responsibilities](#dreamhost):
-  - [ ] Select a managed MySQL provider; PlanetScale is one candidate.
+  - [ ] Select a managed MySQL provider
   - [ ] Migrate the MySQL database.
   - [ ] Move the [backup jobs](#backups-and-recovery) to another scheduler.
   - [ ] Move the keelboat calendar and reservations into database v2.
