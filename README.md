@@ -61,8 +61,6 @@ The main domain uses DNS-only records. Cloudflare redirects `wayc.org` and
 `wycsail.org` (including `www`) to `http://www.washingtonyachtclub.org`, preserving
 paths and query strings. Their mail goes to `mx.mselectron.net`.
 
-Registrant-email changes await approval. DNSSEC is off.
-
 ### Google Workspace and email
 
 Google Workspace hosts the club's Gmail accounts. Its administrator account is
