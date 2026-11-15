@@ -1,6 +1,6 @@
 # Washington Yacht Club Technical Handbook
 
-**Last updated:** 2026-10-13
+**Last updated:** 2026-11-14
 
 **Contact:** Eshan Arora
 
@@ -46,13 +46,28 @@ DreamHost currently provides:
 - WordPress hosting for the public website;
 - MySQL hosting for the production database;
 - hosting for the keelboat calendar and reservation application;
-- registration and authoritative DNS for `washingtonyachtclub.org`;
-- DNS records for Google Workspace and Resend;
 - cron jobs for database backups.
 
 These responsibilities must all be moved or replaced before DreamHost can be
 retired. Existing subdomains and email forwarding addresses must also be inventoried
 during the migration.
+
+### Domains and DNS
+
+`washingtonyachtclub.org`, `wayc.org`, and `wycsail.org` are registered at Joker.com.
+Their authoritative DNS is managed in the Cloudflare account for
+`webmaster@washingtonyachtclub.org`, using `desi.ns.cloudflare.com` and
+`melnicoff.ns.cloudflare.com`.
+
+The main domain's service records are DNS-only; hosting remains with the existing
+providers. Google Workspace and Resend DNS records are managed in Cloudflare.
+For `wayc.org` and `wycsail.org`, proxied apex and `www` records support Cloudflare
+301 redirects to `http://www.washingtonyachtclub.org`, preserving paths and query
+strings. Their mail still routes to `mx.mselectron.net`.
+
+Registrant-email changes to the webmaster address have been requested for all three
+domains and await approval through the existing Joker account email. Registration
+has not yet transferred to Cloudflare. DNSSEC is not enabled.
 
 ### Google Workspace and email
 
@@ -62,7 +77,7 @@ Google.
 
 Database v2 sends transactional email through Resend as
 `database@mail.washingtonyachtclub.org`. The sending domain is configured through
-DreamHost DNS.
+Cloudflare DNS.
 
 ### Square
 
@@ -128,6 +143,10 @@ image storage.
 
 ## To-dos
 
+- [x] Move authoritative DNS for all three domains to Cloudflare.
+- [ ] Complete the registrant-email changes and transfer registration from Joker.com
+      to Cloudflare.
+
 - [ ] Retire DreamHost after migrating its [current responsibilities](#dreamhost):
   - [ ] Select a managed MySQL provider
   - [ ] Migrate the MySQL database.
@@ -136,7 +155,6 @@ image storage.
   - [ ] Complete and deploy the Astro website.
   - [ ] Replace the remaining [WordPress dependencies](#wordpress-dependencies).
   - [ ] Establish the new [photo publishing](#photo-publishing) workflow.
-  - [ ] Move the domain registration and DNS records.
   - [ ] Preserve Google Workspace mail routing, Resend authentication, subdomains,
         and required forwarding addresses.
   - [ ] Confirm that no production system or scheduled task still uses DreamHost.
