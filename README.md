@@ -1,6 +1,6 @@
 # Washington Yacht Club Technical Handbook
 
-**Last updated:** 2026-10-13
+**Last updated:** 2026-11-14
 
 **Contact:** Eshan Arora
 
@@ -46,13 +46,20 @@ DreamHost currently provides:
 - WordPress hosting for the public website;
 - MySQL hosting for the production database;
 - hosting for the keelboat calendar and reservation application;
-- registration and authoritative DNS for `washingtonyachtclub.org`;
-- DNS records for Google Workspace and Resend;
 - cron jobs for database backups.
 
 These responsibilities must all be moved or replaced before DreamHost can be
 retired. Existing subdomains and email forwarding addresses must also be inventoried
 during the migration.
+
+### Domains and DNS
+
+`washingtonyachtclub.org`, `wayc.org`, and `wycsail.org` are registered at Joker.com
+and use Cloudflare DNS under `webmaster@washingtonyachtclub.org`.
+
+The main domain uses DNS-only records. Cloudflare redirects `wayc.org` and
+`wycsail.org` (including `www`) to `http://www.washingtonyachtclub.org`, preserving
+paths and query strings. Their mail goes to `mx.mselectron.net`.
 
 ### Google Workspace and email
 
@@ -62,7 +69,7 @@ Google.
 
 Database v2 sends transactional email through Resend as
 `database@mail.washingtonyachtclub.org`. The sending domain is configured through
-DreamHost DNS.
+Cloudflare DNS.
 
 ### Square
 
@@ -128,6 +135,9 @@ image storage.
 
 ## To-dos
 
+- [ ] Complete the registrant-email changes and transfer registration from Joker.com
+      to Cloudflare.
+
 - [ ] Retire DreamHost after migrating its [current responsibilities](#dreamhost):
   - [ ] Select a managed MySQL provider
   - [ ] Migrate the MySQL database.
@@ -136,7 +146,6 @@ image storage.
   - [ ] Complete and deploy the Astro website.
   - [ ] Replace the remaining [WordPress dependencies](#wordpress-dependencies).
   - [ ] Establish the new [photo publishing](#photo-publishing) workflow.
-  - [ ] Move the domain registration and DNS records.
   - [ ] Preserve Google Workspace mail routing, Resend authentication, subdomains,
         and required forwarding addresses.
   - [ ] Confirm that no production system or scheduled task still uses DreamHost.
