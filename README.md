@@ -54,20 +54,14 @@ during the migration.
 
 ### Domains and DNS
 
-`washingtonyachtclub.org`, `wayc.org`, and `wycsail.org` are registered at Joker.com.
-Their authoritative DNS is managed in the Cloudflare account for
-`webmaster@washingtonyachtclub.org`, using `desi.ns.cloudflare.com` and
-`melnicoff.ns.cloudflare.com`.
+`washingtonyachtclub.org`, `wayc.org`, and `wycsail.org` are registered at Joker.com
+and use Cloudflare DNS under `webmaster@washingtonyachtclub.org`.
 
-The main domain's service records are DNS-only; hosting remains with the existing
-providers. Google Workspace and Resend DNS records are managed in Cloudflare.
-For `wayc.org` and `wycsail.org`, proxied apex and `www` records support Cloudflare
-301 redirects to `http://www.washingtonyachtclub.org`, preserving paths and query
-strings. Their mail still routes to `mx.mselectron.net`.
+The main domain uses DNS-only records. Cloudflare redirects `wayc.org` and
+`wycsail.org` (including `www`) to `http://www.washingtonyachtclub.org`, preserving
+paths and query strings. Their mail goes to `mx.mselectron.net`.
 
-Registrant-email changes to the webmaster address have been requested for all three
-domains and await approval through the existing Joker account email. Registration
-has not yet transferred to Cloudflare. DNSSEC is not enabled.
+Registrant-email changes await approval. DNSSEC is off.
 
 ### Google Workspace and email
 
