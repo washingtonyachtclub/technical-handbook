@@ -135,7 +135,6 @@ image storage.
 
 ## To-dos
 
-- [x] Move authoritative DNS for all three domains to Cloudflare.
 - [ ] Complete the registrant-email changes and transfer registration from Joker.com
       to Cloudflare.
 
