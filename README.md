@@ -59,7 +59,8 @@ and use Cloudflare DNS under `webmaster@washingtonyachtclub.org`.
 
 The main domain uses DNS-only records. Cloudflare redirects `wayc.org` and
 `wycsail.org` (including `www`) to `http://www.washingtonyachtclub.org`, preserving
-paths and query strings. Their mail goes to `mx.mselectron.net`.
+paths and query strings. Both short domains reject email with null MX, SPF, and
+DMARC records.
 
 ### Google Workspace and email
 
@@ -135,8 +136,7 @@ image storage.
 
 ## To-dos
 
-- [ ] Complete the registrant-email changes and transfer registration from Joker.com
-      to Cloudflare.
+- [ ] Complete registration transfers to Cloudflare and enable DNSSEC.
 
 - [ ] Retire DreamHost after migrating its [current responsibilities](#dreamhost):
   - [ ] Select a managed MySQL provider
