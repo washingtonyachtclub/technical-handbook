@@ -59,8 +59,7 @@ and use Cloudflare DNS under `webmaster@washingtonyachtclub.org`.
 
 The main domain uses DNS-only records. Cloudflare redirects `wayc.org` and
 `wycsail.org` (including `www`) to `http://www.washingtonyachtclub.org`, preserving
-paths and query strings. Both short domains reject email with null MX, SPF, and
-DMARC records.
+paths and query strings. Both short domains are web-only; email is disabled.
 
 ### Google Workspace and email
 
