@@ -1,11 +1,10 @@
 # Washington Yacht Club Technical Handbook
 
-**Last updated:** 2026-11-14
+**Last updated:** 2026-11-23
 
 **Contact:** Eshan Arora
 
-This handbook documents the club's production software, infrastructure, and current
-technical migration work.
+This handbook documents the club's production software and infrastructure.
 
 ## Principles
 
@@ -16,50 +15,55 @@ technical migration work.
 
 ## Current systems
 
-| System                             | Platform                       | Current status                                                                                 | Links                                                                                                                                                          |
-| ---------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Public website                     | WordPress on DreamHost         | The production marketing website.                                                              | [Website](https://washingtonyachtclub.org/)                                                                                                                    |
-| Database v2                        | Vercel with MySQL on DreamHost | The current member and club-operations web application.                                        | [database.washingtonyachtclub.org](https://database.washingtonyachtclub.org/) is a CNAME for [wyc-database-v2.vercel.app](https://wyc-database-v2.vercel.app/) |
-| Replacement public website         | Astro                          | Under development and not deployed.                                                            | —                                                                                                                                                              |
-| Keelboat calendar and reservations | DreamHost                      | The current calendar and reservation application. It has not yet been moved into database v2.  | —                                                                                                                                                              |
-| Checkout                           | Database v2                    | The legacy checkout URL now redirects to the database v2 checkout.      | [Checkout](https://database.washingtonyachtclub.org/checkout) · [Legacy checkout](https://checkout.washingtonyachtclub.org/)                               |
-| Novice written tests               | WordPress                      | Being ported to database v2 and nearly ready.                                                  | [Current](https://washingtonyachtclub.org/written-tests/) · [Replacement](https://database.washingtonyachtclub.org/tests)                              |
-| New memberships and renewals       | Database v2                    | Signup, renewal, payment, and officer approval are handled in database v2.                     | [Join](https://database.washingtonyachtclub.org/join) · [Approvals](https://database.washingtonyachtclub.org/membership-approvals)                             |
-| Member and guest waivers           | Database v2 and Cloudflare R2  | Waivers are handled in database v2, with executed PDFs stored privately in R2.                 | [Guest waiver](https://database.washingtonyachtclub.org/guest-waiver)                                                                                          |
-| Documents                          | Public GitHub repository       | Club documents are maintained in the `documents` repository.                                   | [Documents](https://documents.washingtonyachtclub.org/)                                                                                                        |
-| Payments and commerce              | Square                         | Handles membership payments, donations, keelboat reservations, merchandise, and other sales.   | [Square storefront](https://washington-yacht-club.square.site/)                                                                                                |
-| Transactional email                | Resend                         | Database v2 sends club email through Resend.                                                   | —                                                                                                                                                              |
-| Club email                         | Google Workspace               | Hosts the club's Gmail accounts.                                                               | —                                                                                                                                                              |
-| Photos and galleries               | WordPress and Google Drive     | WordPress galleries contain photos through 2022. The club also maintains a photo Google Drive. | [Gallery](https://washingtonyachtclub.org/gallery/) · [Photo Drive](https://photos.washingtonyachtclub.org/)                                                   |
+| System                | Platform                               | Purpose                                                                              | Links                                                                                                         |
+| --------------------- | -------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Public website        | EmDash and Astro on Cloudflare Workers | Public pages, photos, galleries, and navigation, edited in EmDash.                   | [Website](https://washingtonyachtclub.org/) · [Editor](https://washingtonyachtclub.org/_emdash/admin)         |
+| Database              | Vercel with PlanetScale Postgres       | Member records and club operations.                                                  | [Production](https://database.washingtonyachtclub.org/) · [Development](https://dev.washingtonyachtclub.org/) |
+| Documents             | Public GitHub repository               | Club documents maintained in the `documents` repository.                             | [Documents](https://documents.washingtonyachtclub.org/)                                                       |
+| Payments and commerce | Square                                 | Membership payments, donations, keelboat reservations, merchandise, and other sales. | [Square storefront](https://washington-yacht-club.square.site/)                                               |
+| Database emails       | Resend                                 | Email sent by the database application.                                              | —                                                                                                             |
+| Club email            | Google Workspace                       | Club Gmail accounts.                                                                 | —                                                                                                             |
+
+The database application includes:
+
+- [Boat checkout](https://database.washingtonyachtclub.org/checkout).
+- [Keelboat calendar and reservations](https://database.washingtonyachtclub.org/keelboat-calendar).
+- [Written tests](https://database.washingtonyachtclub.org/tests).
+- [Lessons and signups](https://database.washingtonyachtclub.org/lessons).
+- [Membership signup](https://database.washingtonyachtclub.org/join), renewals, payments,
+  and [officer approval](https://database.washingtonyachtclub.org/membership-approvals).
+- Member and [guest waivers](https://database.washingtonyachtclub.org/guest-waiver),
+  with executed PDFs stored privately in Cloudflare R2.
 
 ## Hosting and accounts
 
-### Vercel
+### Public website
 
-Database v2 is deployed on Vercel and connects to the production MySQL database on
-DreamHost. The Vercel account uses `webmaster@washingtonyachtclub.org`.
+Cloudflare Workers runs the EmDash and Astro website. EmDash stores content in
+Cloudflare D1 and images in R2. Editors manage pages, photos, and navigation through
+EmDash without a code deployment. Cloudflare Builds deploys code changes from the
+website repository's `main` branch.
 
-### DreamHost
+### Database hosting
 
-DreamHost currently provides:
+The database application runs on Vercel and connects to PlanetScale Postgres
+(billed through Cloudflare). The PlanetScale branches are `main` for production data
+and `development` for the dev Vercel project and local development.
+The Vercel account uses `webmaster@washingtonyachtclub.org`.
 
-- WordPress hosting for the public website;
-- MySQL hosting for the production database;
-- hosting for the keelboat calendar and reservation application;
-- cron jobs for database backups.
+Vercel runs production's daily reminder job at 15:00 UTC. Dev reminders are disabled.
 
-These responsibilities must all be moved or replaced before DreamHost can be
-retired. Existing subdomains and email forwarding addresses must also be inventoried
-during the migration.
+PlanetScale manages production Postgres backups and point-in-time recovery. Daily
+backups are retained for 30 days. Backups can be restored to a new branch through
+the PlanetScale dashboard.
 
 ### Domains and DNS
 
-`washingtonyachtclub.org`, `wayc.org`, and `wycsail.org` are registered at Joker.com
+`washingtonyachtclub.org`, `wayc.org`, and `wycsail.org` are registered with Cloudflare
 and use Cloudflare DNS under `webmaster@washingtonyachtclub.org`.
 
-The main domain uses DNS-only records. Cloudflare redirects `wayc.org` and
-`wycsail.org` (including `www`) to `http://www.washingtonyachtclub.org`, preserving
-paths and query strings. Their mail goes to `mx.mselectron.net`.
+Cloudflare redirects `wayc.org` and
+`wycsail.org` (including `www`) to `http://www.washingtonyachtclub.org`
 
 ### Google Workspace and email
 
@@ -67,7 +71,7 @@ Google Workspace hosts the club's Gmail accounts. Its administrator account is
 `admin2@washingtonyachtclub.org`. The main domain's incoming mail is routed to
 Google.
 
-Database v2 sends transactional email through Resend as
+The database application sends transactional email through Resend as
 `database@mail.washingtonyachtclub.org`. The sending domain is configured through
 Cloudflare DNS.
 
@@ -77,13 +81,9 @@ Square handles membership payments, donations, keelboat reservation payments,
 merchandise, and other club sales. It also handles employee and payroll tracking for
 ratings examiners.
 
-Square is expected to remain the club's payment platform. Stripe has a better
-developer experience, but splitting payments between providers would make club
-operations and reporting more complicated.
-
 ### Cloudflare R2
 
-Database v2 stores executed member and guest waiver PDFs in a private Cloudflare R2
+The database application stores executed member and guest waiver PDFs in a private Cloudflare R2
 bucket separate from public website images. It accesses the bucket using credentials
 stored in Vercel. Access should remain limited to authorized officers and
 maintainers.
@@ -91,64 +91,14 @@ maintainers.
 ### Account ownership
 
 Many newer service accounts use `webmaster@washingtonyachtclub.org`, including
-Vercel and Backblaze. Credentials and recovery codes must be stored separately from
+Vercel and Cloudflare. Credentials and recovery codes must be stored separately from
 this public repository. Google Workspace is administered through
 `admin2@washingtonyachtclub.org`; the planned shared password manager is for
 non-Google services.
 
-## WordPress dependencies
-
-Moving the public website away from WordPress also requires replacing or migrating:
-
-- novice written tests;
-- photo storage and curated galleries;
-- any remaining WordPress-managed content or integrations.
-
-New-member processing and waivers no longer depend on WordPress. The public website
-embeds Database v2's join page.
-
-## Backups and recovery
-
-The production systems use one MySQL database. It is relatively small, approximately
-100 MB.
-
-DreamHost cron jobs create automatic database backups and store them in Backblaze
-under the webmaster account:
-
-- hourly backups are retained for 24 hours;
-- daily backups are retained for 30 days.
-
-The backup jobs must be moved to another scheduler when the database leaves
-DreamHost.
-
-## Photo publishing
-
-The future website needs a photo system that separates technical infrastructure from
-editorial work. A technical maintainer should build and operate the publishing
-pipeline, while a media director should be able to upload, organize, select, and
-caption photos without working directly with code.
-
-The existing photo Google Drive may serve as the upload and organization interface.
-The final image host and publishing integration have not been selected. A small
-number of website images can remain in Git, but the full gallery should use dedicated
-image storage.
-
 ## To-dos
 
-- [ ] Complete the registrant-email changes and transfer registration from Joker.com
-      to Cloudflare.
-
-- [ ] Retire DreamHost after migrating its [current responsibilities](#dreamhost):
-  - [ ] Select a managed MySQL provider
-  - [ ] Migrate the MySQL database.
-  - [ ] Move the [backup jobs](#backups-and-recovery) to another scheduler.
-  - [ ] Move the keelboat calendar and reservations into database v2.
-  - [ ] Complete and deploy the Astro website.
-  - [ ] Replace the remaining [WordPress dependencies](#wordpress-dependencies).
-  - [ ] Establish the new [photo publishing](#photo-publishing) workflow.
-  - [ ] Preserve Google Workspace mail routing, Resend authentication, subdomains,
-        and required forwarding addresses.
-  - [ ] Confirm that no production system or scheduled task still uses DreamHost.
-- [ ] Set up a shared password manager for non-Google service accounts that:
+- [ ] Fully Retire DreamHost and cancel subscription
+- [ ] Set up a shared password manager for non-Google service accounts:
   - [ ] Make the Commodores the vault administrators.
   - [ ] Grant position holders access only to the accounts they need.
