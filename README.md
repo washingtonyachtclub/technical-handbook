@@ -49,7 +49,6 @@ website repository's `main` branch.
 Cloudflare Workers Builds deploys the database application from the `main` branch
 of `wyc-database-v2`.
 
-The production Worker runs daily reminders at 15:00 UTC.
 [D1 Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/) provides
 30 days of point-in-time recovery on the club’s Workers Paid plan.
 
