@@ -47,15 +47,7 @@ website repository's `main` branch.
 ### Database hosting
 
 Cloudflare Workers Builds deploys the database application from the `main` branch
-of `wyc-database-v2`. Production uses the `wyc-database-production` D1 database.
-
-`npm run dev` runs the Worker locally. It reads and writes the same
-`wyc-database-dev` D1 database as hosted development. R2 files stay local.
-Sign in to Wrangler with the club Cloudflare account and Workers preview access.
-
-Use `npm run db:migrate:dev` for shared dev schema updates. To refresh shared dev
-from production, run `./sync-prod-to-dev.mjs` from `wyc-context`. The `--local`
-flag refreshes only the isolated SQLite copy.
+of `wyc-database-v2`.
 
 The production Worker runs daily reminders at 15:00 UTC.
 [D1 Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/) provides
