@@ -1,6 +1,6 @@
 # Washington Yacht Club Technical Handbook
 
-**Last updated:** 2026-11-23
+**Last updated:** 2026-11-27
 
 **Contact:** Eshan Arora
 
@@ -18,7 +18,7 @@ This handbook documents the club's production software and infrastructure.
 | System                | Platform                               | Purpose                                                                              | Links                                                                                                         |
 | --------------------- | -------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
 | Public website        | EmDash and Astro on Cloudflare Workers | Public pages, photos, galleries, and navigation, edited in EmDash.                   | [Website](https://washingtonyachtclub.org/) · [Editor](https://washingtonyachtclub.org/_emdash/admin)         |
-| Database              | Vercel with PlanetScale Postgres       | Member records and club operations.                                                  | [Production](https://database.washingtonyachtclub.org/) · [Development](https://dev.washingtonyachtclub.org/) |
+| Database              | Cloudflare Workers and D1              | Member records and club operations.                                                  | [Production](https://database.washingtonyachtclub.org/) · [Development](https://wyc-database-dev.wyc-emdash-website.workers.dev/) |
 | Documents             | Public GitHub repository               | Club documents maintained in the `documents` repository.                             | [Documents](https://documents.washingtonyachtclub.org/)                                                       |
 | Payments and commerce | Square                                 | Membership payments, donations, keelboat reservations, merchandise, and other sales. | [Square storefront](https://washington-yacht-club.square.site/)                                               |
 | Database emails       | Resend                                 | Email sent by the database application.                                              | —                                                                                                             |
@@ -46,16 +46,11 @@ website repository's `main` branch.
 
 ### Database hosting
 
-The database application runs on Vercel and connects to PlanetScale Postgres
-(billed through Cloudflare). The PlanetScale branches are `main` for production data
-and `development` for the dev Vercel project and local development.
-The Vercel account uses `webmaster@washingtonyachtclub.org`.
+Cloudflare Workers Builds deploys the database application from the `main` branch
+of `wyc-database-v2`.
 
-Vercel runs production's daily reminder job at 15:00 UTC. Dev reminders are disabled.
-
-PlanetScale manages production Postgres backups and point-in-time recovery. Daily
-backups are retained for 30 days. Backups can be restored to a new branch through
-the PlanetScale dashboard.
+[D1 Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/) provides
+30 days of point-in-time recovery on the club’s Workers Paid plan.
 
 ### Domains and DNS
 
@@ -83,15 +78,12 @@ ratings examiners.
 
 ### Cloudflare R2
 
-The database application stores executed member and guest waiver PDFs in a private Cloudflare R2
-bucket separate from public website images. It accesses the bucket using credentials
-stored in Vercel. Access should remain limited to authorized officers and
-maintainers.
+The database Worker uses R2 bindings to access private buckets for signed waivers
+and member profile photos.
 
 ### Account ownership
 
-Many newer service accounts use `webmaster@washingtonyachtclub.org`, including
-Vercel and Cloudflare. Credentials and recovery codes must be stored separately from
+The club’s Cloudflare account uses `webmaster@washingtonyachtclub.org`. Credentials and recovery codes must be stored separately from
 this public repository. Google Workspace is administered through
 `admin2@washingtonyachtclub.org`; the planned shared password manager is for
 non-Google services.
